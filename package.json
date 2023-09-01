@@ -1,0 +1,21 @@
+{
+  "name": "geo-stats",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/France-ioi/geo-stats",
+  "author": "Michel Blockelet <blockelet@crans.org>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jose": "^4.14.4",
+    "lru-cache": "^10.0.1",
+    "maxmind": "^4.3.11",
+    "mysql": "^2.18.1",
+    "node-jose": "^2.2.0"
+  }
+}
