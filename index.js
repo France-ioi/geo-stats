@@ -6,6 +6,7 @@ const jose = require('jose');
 const mysql = require('mysql');
 const maxmind = require('maxmind');
 const { LRUCache } = require('lru-cache');
+const { connect } = require('http2');
 
 dotenv.config();
 const connection = mysql.createConnection({
@@ -15,18 +16,32 @@ const connection = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-connection.connect((err) => {
-    if (err) {
-        console.error('Error connecting to database:', err);
-        return;
+function mysqlConnect() {
+    connection.connect((err) => {
+        if (err) {
+            console.error('Error connecting to database:', err);
+            setTimeout(mysqlConnect, 2000);
+            return;
+        }
+        console.log('Connected to database!');
+    });
+}
+
+connection.on('error', (err) => {
+    console.error('Error connecting to database:', err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+        mysqlConnect();
+    } else {
+        throw err;
     }
-    console.log('Connected to database!');
 });
+
+mysqlConnect();
 
 const mmdb = new maxmind.Reader(fs.readFileSync(process.env.MMDB_PATH));
 const cityCache = new LRUCache({ max: 5000, maxAge: 1000 * 60 * 60 * 24 });
 const platforms = {};
-const private_key = null;
+let private_key = null;
 jose.importPKCS8(fs.readFileSync(process.env.PRIVATE_KEY_PATH).toString()).then((key) => {
     private_key = key;
 });
